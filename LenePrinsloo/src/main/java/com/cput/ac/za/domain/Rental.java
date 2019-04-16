@@ -1,11 +1,10 @@
 package com.cput.ac.za.domain;
 
 import java.io.*;
-import java.lang.module.ModuleDescriptor;
 import java.util.*;
 import java.lang.*;
 
-public class Rental  implements Serializable
+public class Rental implements Serializable
 {
     private int rentalNumber;
     private String dateRented;
@@ -15,30 +14,22 @@ public class Rental  implements Serializable
     private double totalPenaltyCost;
     private static final double PENALTY_COST_PER_DAY = 5;
 
-    public Rental() {
+    Penalty penalty = new Penalty();
+
+    public Rental()
+    {
     }
 
-    public Rental (ModuleDescriptor.Builder builder) {
+    private Rental (Builder builder)
+    {
         this.rentalNumber = builder.rentalNumber;
         this.dateRented = builder.dateRented;
-        this.dateReturned = "NA";
-//        this.pricePerDay = pricePerDay;
+        this.dateReturned = builder.dateReturned;
         this.custNumber = builder.custNumber;
         this.dvdNumber = builder.dvdNumber;
-//        determineTotalPenaltyCost();
     }
 
-    public Rental (int  rentalNumber, String dateRented, String dateReturned,
-                   int custNumber , int dvdNumber) {
-        this.rentalNumber = rentalNumber;
-        this.dateRented = dateRented;
-//        this.pricePerDay = pricePerDay;
-        setDateReturned(dateReturned);
-        determineTotalPenaltyCost();
-        this.custNumber = custNumber;
-        this.dvdNumber = dvdNumber;
-
-    }
+    //Get Methods
     public int getDvdNumber()
     {
         return this.dvdNumber;
@@ -59,95 +50,27 @@ public class Rental  implements Serializable
     {
         return this.dateReturned;
     }
-    //    public double getPricePerDay()
-//    {
-//        return this.pricePerDay;
-//    }
-    public void setRentalNumber(int rn)
-    {
-        this.rentalNumber = rn;
-    }
-    public void setDateRented(String rentD)
-    {
-        this.dateRented = rentD;
-    }
-    //    public void setPricePerDay(double pricePerDay)
-//    {
-//        this.pricePerDay = pricePerDay;
-//    }
-    public void setDateReturned(String ret)
-    {
-        this.dateReturned = ret;
-        determineTotalPenaltyCost();
-    }
-    public void setCustNumber(int cn)
-    {
-        this.custNumber = cn;
-    }
-    public void setdvdNumber(int mov)
-    {
-        this.dvdNumber = mov;
-    }
+
+    //Working out Penalty
     public double getTotalPenaltyCost()
     {
         return totalPenaltyCost;
     }
+
+    //
     public void determineTotalPenaltyCost()
     {
-        totalPenaltyCost = numberOfDaysOverdue() * PENALTY_COST_PER_DAY;
+        totalPenaltyCost = penalty.numberOfDaysOverdue() * PENALTY_COST_PER_DAY;
 
     }
-    private int dateDifference(String dateRented, String dateReturned) {
-        int yyyy, mm, dd;
-        StringTokenizer token;
-        Calendar cal1 = new GregorianCalendar();
-        Calendar cal2 = new GregorianCalendar();
 
-        token = new StringTokenizer(dateRented, "/");
-        yyyy = Integer.parseInt(token.nextToken());
-        mm = Integer.parseInt(token.nextToken());
-        dd = Integer.parseInt(token.nextToken());
-        cal1.set(yyyy, mm, dd);
-        if (!dateReturned.equalsIgnoreCase("NA")){
-            token = new StringTokenizer(dateReturned, "/");
-            yyyy = Integer.parseInt(token.nextToken());
-            mm = Integer.parseInt(token.nextToken());
-            dd = Integer.parseInt(token.nextToken());
-            cal2.set(yyyy, mm, dd);
-            return (daysBetween(cal1.getTime(),cal2.getTime()));
-        }
-        else
-            return (0);
-    }
-    private int daysBetween(Date d1, Date d2){
-        return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)+1);
-    }
-
-    public int numberOfDaysOverdue()
-    {
-        int days = dateDifference(dateRented, dateReturned)-2;
-        if (days < 0)
-            return 0;
-        else
-            return days;
-    }
-
-    public Object[] toObjectArray()
-    {
-        return new Object[]{rentalNumber, dateRented, dateReturned, custNumber, dvdNumber, totalPenaltyCost};
-    }
-
-    public String toString() {
-        return "Rental#:" + rentalNumber + "  Date Rented:" + dateRented + "   Date Returned:" + dateReturned + "\nPenalty cost per day:R" + PENALTY_COST_PER_DAY + "  Total Penalty Cost:R" +
-                totalPenaltyCost + "  Customer#:" + custNumber + "  Movie#:" + dvdNumber +"\nNo of Days overdue:" + numberOfDaysOverdue()+"\n";
-    }
-
+    //Builder Class
     public static class Builder
     {
 
         private int rentalNumber, custNumber, dvdNumber;
         private String dateRented, dateReturned;
-
+        //private Set<Course> courses;
 
         public Builder rentalNumber( int rentalNumber)
         {
@@ -155,22 +78,47 @@ public class Rental  implements Serializable
             return this;
         }
 
-        public Builder studentFirstName( String studentFirstName) {
-            this.studentFirstName = studentFirstName;
+        public Builder custNumber( int custNumber)
+        {
+            this.custNumber = custNumber;
             return this;
         }
 
-        public Builder studentLastName( String studentLastName) {
-            this.studentLastName = studentLastName;
+        public Builder dvdNumber( int dvdNumber)
+        {
+            this.dvdNumber = dvdNumber;
             return this;
         }
 
-        public Builder age( int age) {
-            this.age = age;
+        public Builder dateRented( String dateRented)
+        {
+            this.dateRented = dateRented;
             return this;
         }
 
-        public Student build() {
-            return new Student(this);
+        public Builder dateReturned( String dateReturned)
+        {
+            this.dateReturned = dateReturned;
+            return this;
         }
+
+        public Rental build()
+        {
+            return new Rental(this);
+        }
+
+    }
+
+    //Creating Rental Object
+    public Object[] toObjectArray()
+    {
+        return new Object[]{rentalNumber, dateRented, dateReturned, custNumber, dvdNumber, totalPenaltyCost};
+    }
+
+    //toString Method
+    public String toString()
+    {
+        return "Rental#:" + rentalNumber + "  Date Rented:" + dateRented + "   Date Returned:" + dateReturned + "\nPenalty cost per day:R" + PENALTY_COST_PER_DAY + "  Total Penalty Cost:R" +
+                totalPenaltyCost + "  Customer#:" + custNumber + "  Movie#:" + dvdNumber +"\nNo of Days overdue:" + penalty.numberOfDaysOverdue()+"\n";
+    }
 }
